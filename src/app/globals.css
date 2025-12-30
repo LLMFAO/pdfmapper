@@ -1,0 +1,437 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PDF MAPPER - DARK BRUTALIST DESIGN SYSTEM
+   A stark, high-contrast interface for precise PDF field mapping
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ─────────────────────────────────────────────────────────────────────────
+     COLOR PALETTE - Obsidian & Electric
+     ───────────────────────────────────────────────────────────────────────── */
+  --color-void: #0a0a0a;
+  --color-obsidian: #121212;
+  --color-charcoal: #1a1a1a;
+  --color-graphite: #2a2a2a;
+  --color-slate: #3a3a3a;
+  --color-steel: #6a6a6a;
+  --color-silver: #9a9a9a;
+  --color-ash: #c0c0c0;
+  --color-bone: #e0e0e0;
+  --color-white: #fafafa;
+
+  /* Accent - Electric Cyan */
+  --color-electric: #00ffff;
+  --color-electric-dim: #00cccc;
+  --color-electric-glow: rgba(0, 255, 255, 0.15);
+
+  /* Status Colors */
+  --color-success: #00ff88;
+  --color-warning: #ffcc00;
+  --color-danger: #ff3366;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     TYPOGRAPHY
+     ───────────────────────────────────────────────────────────────────────── */
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-mono: "Space Mono", "JetBrains Mono", monospace;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     SPACING & SIZING
+     ───────────────────────────────────────────────────────────────────────── */
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     ANIMATIONS
+     ───────────────────────────────────────────────────────────────────────── */
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-display);
+  background-color: var(--color-void);
+  color: var(--color-bone);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: 
+    radial-gradient(ellipse at 50% 0%, var(--color-charcoal) 0%, transparent 50%),
+    var(--color-void);
+}
+
+/* Selection */
+::selection {
+  background: var(--color-electric);
+  color: var(--color-void);
+}
+
+/* Scrollbar - Brutalist thin */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-obsidian);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-slate);
+  border: 1px solid var(--color-graphite);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-steel);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TYPOGRAPHY UTILITIES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.text-electric {
+  color: var(--color-electric);
+}
+
+.text-muted {
+  color: var(--color-steel);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BUTTON SYSTEM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+  background: var(--color-graphite);
+  color: var(--color-bone);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-snappy);
+}
+
+.btn:hover {
+  background: var(--color-slate);
+  border-color: var(--color-steel);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--color-electric);
+  color: var(--color-void);
+  border-color: var(--color-electric);
+}
+
+.btn-primary:hover {
+  background: var(--color-electric-dim);
+  border-color: var(--color-electric-dim);
+  box-shadow: 0 0 20px var(--color-electric-glow);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--color-slate);
+}
+
+.btn-ghost:hover {
+  background: var(--color-graphite);
+  border-color: var(--color-steel);
+}
+
+.btn-danger {
+  background: transparent;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.btn-danger:hover {
+  background: var(--color-danger);
+  color: var(--color-void);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CARD / PANEL SYSTEM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.panel {
+  background: var(--color-obsidian);
+  border: 1px solid var(--color-graphite);
+}
+
+.panel-elevated {
+  background: var(--color-charcoal);
+  border: 1px solid var(--color-slate);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INPUT SYSTEM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--color-void);
+  border: 1px solid var(--color-slate);
+  color: var(--color-bone);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-snappy);
+}
+
+.input::placeholder {
+  color: var(--color-steel);
+}
+
+.input:focus {
+  border-color: var(--color-electric);
+  box-shadow: 0 0 0 1px var(--color-electric-glow);
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-steel);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DROPZONE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  min-height: 300px;
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      var(--color-charcoal) 10px,
+      var(--color-charcoal) 11px
+    );
+  border: 2px dashed var(--color-slate);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-snappy);
+}
+
+.dropzone:hover {
+  border-color: var(--color-electric);
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      var(--color-graphite) 10px,
+      var(--color-graphite) 11px
+    );
+}
+
+.dropzone.active {
+  border-color: var(--color-electric);
+  background: var(--color-electric-glow);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PDF CANVAS / MAPPING AREA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.pdf-page-container {
+  position: relative;
+  background: white;
+  box-shadow: 
+    0 0 0 1px var(--color-graphite),
+    0 20px 60px -20px rgba(0, 0, 0, 0.8);
+}
+
+.field-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  cursor: crosshair;
+}
+
+.field-rect {
+  position: absolute;
+  background: var(--color-electric-glow);
+  border: 2px solid var(--color-electric);
+  cursor: move;
+  transition: box-shadow var(--duration-fast) var(--ease-snappy);
+}
+
+.field-rect:hover {
+  box-shadow: 0 0 20px var(--color-electric-glow);
+}
+
+.field-rect.selected {
+  border-color: var(--color-success);
+  background: rgba(0, 255, 136, 0.15);
+}
+
+.field-rect-label {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--color-electric);
+  color: var(--color-void);
+  white-space: nowrap;
+}
+
+/* Resize handles */
+.resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--color-electric);
+  border: 1px solid var(--color-void);
+}
+
+.resize-handle.nw { top: -4px; left: -4px; cursor: nw-resize; }
+.resize-handle.ne { top: -4px; right: -4px; cursor: ne-resize; }
+.resize-handle.sw { bottom: -4px; left: -4px; cursor: sw-resize; }
+.resize-handle.se { bottom: -4px; right: -4px; cursor: se-resize; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sidebar {
+  width: 320px;
+  height: 100vh;
+  position: fixed;
+  right: 0;
+  top: 0;
+  background: var(--color-obsidian);
+  border-left: 1px solid var(--color-graphite);
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--color-graphite);
+}
+
+.sidebar-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-steel);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FIELD LIST ITEM
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.field-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--color-graphite);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-snappy);
+}
+
+.field-list-item:hover {
+  background: var(--color-charcoal);
+}
+
+.field-list-item.active {
+  background: var(--color-graphite);
+  border-left: 2px solid var(--color-electric);
+}
+
+.field-key {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-electric);
+}
+
+.field-type {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-steel);
+  padding: 2px 6px;
+  background: var(--color-graphite);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LOADING STATES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes pulse-electric {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loading {
+  animation: pulse-electric 1.5s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOAST OVERRIDES (Sonner)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-sonner-toaster] {
+  --normal-bg: var(--color-charcoal);
+  --normal-border: var(--color-slate);
+  --normal-text: var(--color-bone);
+  --success-bg: var(--color-charcoal);
+  --success-border: var(--color-success);
+  --success-text: var(--color-success);
+  --error-bg: var(--color-charcoal);
+  --error-border: var(--color-danger);
+  --error-text: var(--color-danger);
+}
