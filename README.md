@@ -42,6 +42,16 @@ Because every field relies on structured JSON data, you can automate your docume
 
 ## 📦 Usage Guide
 
+### 🧪 Quick Start (Try it yourself)
+We've included test files in the `test_files/` directory so you can experience the full workflow immediately:
+
+1.  **Upload PDF**: Use `test_files/CO-NHP-psychological-nuero-testing-auth-request-form.pdf`.
+2.  **Import Template**: Click **Import Template** and select `test_files/greyrock-layout-updated.json`.
+    - *You will see dozens of fields instantly mapped onto the document.*
+3.  **Generate**: Click **Generate PDF**, switch to **JSON View**, and paste the content of `test_files/mockdata.json`.
+4.  **Result**: Watch the PDF fill automatically with complex, real-world data.
+
+### Standard Workflow
 1. **Upload**: Select your blank PDF.
 2. **Map**: Draw boxes. Each box represents a discrete data field in your future JSON.
 3. **Generate**: Provide the data.
