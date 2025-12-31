@@ -44,7 +44,16 @@ Because every field relies on structured JSON data, you can automate your docume
 
 1. **Upload**: Select your blank PDF.
 2. **Map**: Draw boxes. Each box represents a discrete data field in your future JSON.
-3. **Generate**: Provide the data (manual entry or JSON paste).
+3. **Generate**: Provide the data.
+   - **Form View**: Use the auto-generated form for quick, granular edits.
+     
+     ![Form View](screenshots/generate-form.png)
+     
+   - **JSON View**: Switch to JSON mode to paste entire datasets or API payloads.
+     
+     ![JSON View](screenshots/generate-json.png)
+
+   *The PDF preview updates automatically in real-time.*
 4. **Download**: Get your flattened, production-ready PDF.
 
 ---
