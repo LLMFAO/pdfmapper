@@ -4,9 +4,9 @@
 
 ![PDF Mapper Interface](screenshots/main1.png)
 
-We've all been there: opening a static PDF form, manually clicking through fields, typing the same data for the hundredth time, and hoping you didn't make a typo. And the next time you need it? You start from scratch.
+Sick of the PDF Edit PITA? Me too. 
 
-**PDF Mapper solves this.** It turns your static, flat PDF documents into **dynamic, data-driven templates**.
+**PDF Mapper** It turns your static, flat PDF documents into **dynamic, data-driven templates**.
 
 - **Map Once**: Draw fields on your PDF visually.
 - **Generate Infinitely**: Feed it JSON data to create perfect, filled PDFs instantly.
@@ -57,4 +57,4 @@ Because every field relies on structured JSON data, you can automate your docume
 4. **Download**: Get your flattened, production-ready PDF.
 
 ---
-*Built with ❤️ for efficiency.*
+
