@@ -2,7 +2,7 @@
 
 **Stop filling out the same PDF over and over again.**
 
-![PDF Mapper Interface](screenshots/main1.png)
+![PDF Mapper Tour](screenshots/readme.gif)
 
 Sick of the PDF Edit PITA? Me too. 
 
