@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { X, Download, Copy, Play, RefreshCw, FileText, ChevronRight } from 'lucide-react';
+import { X, Download, Copy, Play, RefreshCw, FileText, Code, LayoutTemplate } from 'lucide-react';
 import { toast } from 'sonner';
 import { Field } from '@/types';
 
@@ -18,6 +18,18 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
     const [jsonInput, setJsonInput] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<'form' | 'json'>('form');
+
+    // Sort fields for logical tab order: Page -> Y position -> X position
+    const sortedFields = useMemo(() => {
+        return [...fields].sort((a, b) => {
+            if (a.page_number !== b.page_number) return a.page_number - b.page_number;
+            // Round Y to avoid minor alignment issues affecting order
+            const yDiff = Math.round(a.rect.y * 100) - Math.round(b.rect.y * 100);
+            if (yDiff !== 0) return yDiff;
+            return a.rect.x - b.rect.x;
+        });
+    }, [fields]);
 
     // Initial sample generation
     useEffect(() => {
@@ -33,18 +45,48 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
         };
     }, [previewUrl]);
 
+    // Debounced Auto-Preview
+    useEffect(() => {
+        if (!isOpen || !pdfUrl || !jsonInput) return;
+
+        const timer = setTimeout(() => {
+            handlePreview();
+        }, 800); // 800ms debounce
+
+        return () => clearTimeout(timer);
+    }, [jsonInput, isOpen, pdfUrl]);
+
     const generateSampleJson = () => {
         const sample: Record<string, string | boolean | number> = {};
         fields.forEach(f => {
             if (f.type === 'checkbox') {
-                sample[f.key] = true;
+                sample[f.key] = false;
             } else if (f.type === 'date') {
                 sample[f.key] = new Date().toISOString().split('T')[0];
             } else {
-                sample[f.key] = `Value for ${f.key}`;
+                sample[f.key] = '';
             }
         });
         setJsonInput(JSON.stringify(sample, null, 2));
+    };
+
+    const handleFieldChange = (key: string, value: string | boolean | number) => {
+        try {
+            const currentData = jsonInput ? JSON.parse(jsonInput) : {};
+            const newData = { ...currentData, [key]: value };
+            setJsonInput(JSON.stringify(newData, null, 2));
+        } catch {
+            // Ignore invalid JSON state when using form controls
+        }
+    };
+
+    const getFieldValue = (key: string) => {
+        try {
+            const data = JSON.parse(jsonInput);
+            return data[key] ?? '';
+        } catch {
+            return '';
+        }
     };
 
     const handlePreview = async () => {
@@ -58,8 +100,7 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
             try {
                 data = JSON.parse(jsonInput);
             } catch (e) {
-                toast.error('Invalid JSON');
-                setIsGenerating(false);
+                // Keep old preview if JSON is invalid
                 return;
             }
 
@@ -83,7 +124,6 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
                 const { width, height } = page.getSize();
 
                 // Calculate Pts & Font Size
-                // Web: Top-Left origin. PDF: Bottom-Left origin.
                 const x = field.rect.x * width + 2; // +padding
 
                 const fontSizeMap = {
@@ -93,10 +133,9 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
                 };
                 const fontSize = fontSizeMap[field.fontSize || 'medium'];
 
-                // Basic alignment: specific offset from top of box
+                // Basic alignment
                 const y = height - (field.rect.y * height) - fontSize - 2;
-
-                const boxWidth = (field.rect.w * width) - 4; // Width with padding
+                const boxWidth = (field.rect.w * width) - 4;
                 const lineHeight = fontSize * 1.2;
 
                 if (field.type === 'checkbox') {
@@ -126,7 +165,6 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
             const pdfBytes = await pdfDoc.save();
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
 
-            // Clean up old preview if exists
             if (previewUrl) URL.revokeObjectURL(previewUrl);
 
             const url = URL.createObjectURL(blob);
@@ -134,7 +172,6 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
 
         } catch (error) {
             console.error(error);
-            toast.error('Failed to generate preview');
         } finally {
             setIsGenerating(false);
         }
@@ -154,15 +191,38 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className={`bg-charcoal border border-graphite rounded-lg shadow-2xl flex flex-col max-h-[90vh] transition-all duration-300 ${previewUrl ? 'w-[90vw] max-w-6xl' : 'w-full max-w-2xl'}`}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div className={`bg-charcoal border border-graphite rounded-lg shadow-2xl flex flex-col transition-all duration-300 w-full max-w-[95vw] h-[90vh]`}>
 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-graphite">
-                    <h2 className="text-lg font-mono text-bone flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-electric" />
-                        Generate & Preview
-                    </h2>
+                    <div className="flex items-center gap-4">
+                        <h2 className="text-lg font-mono text-bone flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-electric" />
+                            Generate & Preview
+                        </h2>
+
+                        {/* View Toggle */}
+                        <div className="flex items-center bg-void border border-graphite rounded-md p-1">
+                            <button
+                                onClick={() => setViewMode('form')}
+                                className={`flex items-center gap-2 px-3 py-1 rounded-sm text-xs font-mono transition-colors ${viewMode === 'form' ? 'bg-charcoal text-electric shadow-sm' : 'text-steel hover:text-bone'
+                                    }`}
+                            >
+                                <LayoutTemplate className="w-3 h-3" />
+                                Form
+                            </button>
+                            <button
+                                onClick={() => setViewMode('json')}
+                                className={`flex items-center gap-2 px-3 py-1 rounded-sm text-xs font-mono transition-colors ${viewMode === 'json' ? 'bg-charcoal text-electric shadow-sm' : 'text-steel hover:text-bone'
+                                    }`}
+                            >
+                                <Code className="w-3 h-3" />
+                                JSON
+                            </button>
+                        </div>
+                    </div>
+
                     <button onClick={onClose} className="text-steel hover:text-bone">
                         <X className="w-5 h-5" />
                     </button>
@@ -171,60 +231,100 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
                 {/* Content */}
                 <div className="flex-1 overflow-hidden flex">
                     {/* Left Panel: Input */}
-                    <div className={`flex flex-col p-6 space-y-4 border-r border-graphite bg-void/30 ${previewUrl ? 'w-1/3' : 'w-full'}`}>
-                        <div className="flex justify-between items-center">
-                            <p className="text-sm text-steel font-mono">Input Data (JSON)</p>
+                    <div className="w-[450px] flex flex-col border-r border-graphite bg-void/30 flex-shrink-0">
+                        <div className="flex justify-between items-center p-4 border-b border-graphite/50 bg-charcoal/50">
+                            <p className="text-sm text-steel font-mono">Input Data</p>
                             <button
                                 onClick={generateSampleJson}
                                 className="flex items-center gap-1 bg-charcoal border border-graphite px-2 py-1 rounded text-[10px] text-steel hover:text-bone transition-colors"
                             >
                                 <Copy className="w-3 h-3" />
-                                Sample
+                                Reset / Sample
                             </button>
                         </div>
 
-                        <textarea
-                            value={jsonInput}
-                            onChange={(e) => setJsonInput(e.target.value)}
-                            className="flex-1 w-full bg-void border border-graphite rounded p-3 font-mono text-xs text-bone focus:border-electric outline-none resize-none"
-                            placeholder="{ ... }"
-                        />
+                        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                            {viewMode === 'form' ? (
+                                <div className="space-y-4">
+                                    {sortedFields.map(field => (
+                                        <div key={field.key} className="space-y-1.5">
+                                            <label className="text-[10px] font-mono uppercase text-steel block tracking-wider truncate" title={field.key}>
+                                                {field.key.replace(/_/g, ' ')}
+                                            </label>
 
-                        <button
-                            onClick={handlePreview}
-                            disabled={isGenerating || !jsonInput.trim()}
-                            className="btn btn-primary w-full flex items-center justify-center gap-2 py-3"
-                        >
-                            {isGenerating ? (
-                                <RefreshCw className="w-4 h-4 animate-spin" />
+                                            {field.type === 'checkbox' ? (
+                                                <label className="flex items-center gap-2 cursor-pointer p-2 border border-graphite rounded hover:border-steel bg-void/50 transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!getFieldValue(field.key)}
+                                                        onChange={(e) => handleFieldChange(field.key, e.target.checked)}
+                                                        className="w-4 h-4 rounded-sm border-gray-600 bg-transparent text-electric focus:ring-offset-black"
+                                                    />
+                                                    <span className="text-xs text-bone font-mono">Checked</span>
+                                                </label>
+                                            ) : field.type === 'date' ? (
+                                                <input
+                                                    type="date"
+                                                    value={getFieldValue(field.key)}
+                                                    onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                                                    className="w-full bg-void border border-graphite rounded px-3 py-2 font-mono text-xs text-bone focus:border-electric outline-none"
+                                                />
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    value={getFieldValue(field.key)}
+                                                    onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                                                    className="w-full bg-void border border-graphite rounded px-3 py-2 font-mono text-xs text-bone focus:border-electric outline-none placeholder:text-graphite transition-all hover:bg-void/80"
+                                                    placeholder={`Enter ${field.key}...`}
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             ) : (
-                                <Play className="w-4 h-4" />
+                                <textarea
+                                    value={jsonInput}
+                                    onChange={(e) => setJsonInput(e.target.value)}
+                                    className="w-full h-full min-h-[500px] bg-void border border-graphite rounded p-3 font-mono text-xs text-bone focus:border-electric outline-none resize-none"
+                                    placeholder="{ ... }"
+                                />
                             )}
-                            {previewUrl ? 'Update Preview' : 'Generate Preview'}
-                        </button>
+                        </div>
                     </div>
 
                     {/* Right Panel: Preview */}
-                    {previewUrl && (
-                        <div className="flex-1 flex flex-col bg-graphite/10 relative">
+                    <div className="flex-1 flex flex-col bg-graphite/10 relative">
+                        {isGenerating && (
+                            <div className="absolute top-4 right-4 z-10 bg-charcoal/90 text-electric text-xs font-mono px-3 py-1 rounded-full flex items-center gap-2 shadow-lg border border-electric/20 backdrop-blur-md animate-pulse">
+                                <RefreshCw className="w-3 h-3 animate-spin" />
+                                Updating...
+                            </div>
+                        )}
+
+                        {previewUrl ? (
                             <iframe
                                 src={`${previewUrl}#toolbar=0&navpanes=0`}
                                 className="w-full h-full border-none"
                                 title="PDF Preview"
                             />
-
-                            {/* Overlay Download Button */}
-                            <div className="absolute bottom-6 right-6">
-                                <button
-                                    onClick={handleDownload}
-                                    className="btn btn-primary shadow-lg flex items-center gap-2 px-6 py-3 text-sm"
-                                >
-                                    <Download className="w-4 h-4" />
-                                    Download Final PDF
-                                </button>
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-steel font-mono text-sm flex-col gap-4">
+                                <RefreshCw className="w-8 h-8 animate-spin opacity-50" />
+                                <p>Initializing Preview...</p>
                             </div>
+                        )}
+
+                        {/* Overlay Download Button */}
+                        <div className="absolute bottom-6 right-6">
+                            <button
+                                onClick={handleDownload}
+                                className="btn btn-primary shadow-lg flex items-center gap-2 px-6 py-3 text-sm hover:scale-105 transition-transform"
+                            >
+                                <Download className="w-4 h-4" />
+                                Download PDF
+                            </button>
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
         </div>
