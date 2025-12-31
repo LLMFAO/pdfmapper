@@ -14,7 +14,7 @@ interface GenerationModalProps {
     templateName: string;
 }
 
-export default function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName }: GenerationModalProps) {
+export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName }: GenerationModalProps) {
     const [jsonInput, setJsonInput] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
