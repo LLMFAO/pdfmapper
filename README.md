@@ -1,6 +1,16 @@
 # PDF Mapper & Generator 📄✨
 
-A sophisticated, browser-based tool for mapping interactions onto PDF documents and generating filled PDFs with dynamic data. built with **Next.js 14**, **React**, and **pdf-lib**.
+**Stop filling out the same PDF over and over again.**
+
+We've all been there: opening a static PDF form, manually clicking through fields, typing the same data for the hundredth time, and hoping you didn't make a typo. And the next time you need it? You start from scratch.
+
+**PDF Mapper solves this.** It turns your static, flat PDF documents into **dynamic, data-driven templates**.
+
+- **Map Once**: Draw fields on your PDF visually.
+- **Generate Infinitely**: Feed it JSON data (or use our Form View) to create perfect, filled PDFs instantly.
+- **Save Your Work**: Export your mapping as a lightweight JSON template. Never re-map the same form again.
+
+Built with **Next.js 14**, **React**, and **pdf-lib** for a fast, client-side experience.
 
 ## 🚀 Features
 
