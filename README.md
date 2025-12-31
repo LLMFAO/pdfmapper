@@ -2,15 +2,24 @@
 
 **Stop filling out the same PDF over and over again.**
 
+[**Live Demo: pdfmap.netlify.app**](https://pdfmap.netlify.app)
+
 ![PDF Mapper Tour](screenshots/readme.gif)
 
 Sick of the PDF Edit PITA? Me too. 
 
-**PDF Mapper** It turns your static, flat PDF documents into **dynamic, data-driven templates**.
+**PDF Mapper** turns your static, flat PDF documents into **dynamic, data-driven templates**.
 
 - **Map Once**: Draw fields on your PDF visually.
 - **Generate Infinitely**: Feed it JSON data to create perfect, filled PDFs instantly.
 - **Save Your Work**: Export your mapping as a lightweight JSON template.
+
+## 🔒 Security & Privacy: 100% Client-Side
+Unlike other "AI PDF" tools, **no AI is used to process your documents.** 
+- **Deterministic Processing**: All data injection and PDF creation is done purely with code (`pdf-lib`) in your browser.
+- **Your Data Stays Local**: Your PDFs and data never touch a server or an LLM. Data is processed in your machine's RAM and disappears when you close the tab.
+- **Zero AI Hallucinations**: Because there is no AI in the core generation engine, the data goes exactly where you map it—every time.
+
 
 ## 🚀 The Power of Discrete Data Fields
 
