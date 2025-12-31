@@ -1,8 +1,6 @@
-'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { X, Download, Copy, Play } from 'lucide-react';
+import { X, Download, Copy, Play, RefreshCw, FileText, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Field } from '@/types';
 
@@ -14,11 +12,24 @@ interface GenerationModalProps {
     templateName: string;
 }
 
-export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName }: GenerationModalProps) {
+export default function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName }: GenerationModalProps) {
     const [jsonInput, setJsonInput] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-    if (!isOpen) return null;
+    // Initial sample generation
+    useEffect(() => {
+        if (isOpen && !jsonInput && fields.length > 0) {
+            generateSampleJson();
+        }
+    }, [isOpen]);
+
+    // Cleanup preview URL
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+    }, [previewUrl]);
 
     const generateSampleJson = () => {
         const sample: Record<string, string | boolean | number> = {};
@@ -34,7 +45,7 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
         setJsonInput(JSON.stringify(sample, null, 2));
     };
 
-    const handleGenerate = async () => {
+    const handlePreview = async () => {
         if (!pdfUrl) return;
 
         try {
@@ -69,17 +80,10 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
                 const page = pages[pageIndex];
                 const { width, height } = page.getSize();
 
-                // Calculate Pts
+                // Calculate Pts & Font Size
                 // Web: Top-Left origin. PDF: Bottom-Left origin.
                 const x = field.rect.x * width + 2; // +padding
 
-                // Y calculation:
-                // field.rect.y is distance from TOP. 
-                // We want to draw text at a y-coordinate measured from BOTTOM.
-                // Box Top (from Bottom) = height - (field.rect.y * height)
-                // We draw text slightly below the top of the box.
-
-                // Calculate Font Size
                 const fontSizeMap = {
                     small: 7,
                     medium: 9,
@@ -116,83 +120,109 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
                 }
             }
 
-            // Save and Download
+            // Generate Blob
             const pdfBytes = await pdfDoc.save();
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `filled_${(templateName || 'document').replace(/\s+/g, '_')}.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
 
-            toast.success('PDF Generated!');
+            // Clean up old preview if exists
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+
+            const url = URL.createObjectURL(blob);
+            setPreviewUrl(url);
 
         } catch (error) {
             console.error(error);
-            toast.error('Failed to generate PDF');
+            toast.error('Failed to generate preview');
         } finally {
             setIsGenerating(false);
         }
     };
 
+    const handleDownload = () => {
+        if (!previewUrl) return;
+        const link = document.createElement('a');
+        link.href = previewUrl;
+        link.download = `filled_${(templateName || 'document').replace(/\s+/g, '_')}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success('PDF Downloaded');
+    };
+
+    if (!isOpen) return null;
+
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-charcoal border border-graphite w-full max-w-2xl rounded-lg shadow-2xl flex flex-col max-h-[90vh]">
+            <div className={`bg-charcoal border border-graphite rounded-lg shadow-2xl flex flex-col max-h-[90vh] transition-all duration-300 ${previewUrl ? 'w-[90vw] max-w-6xl' : 'w-full max-w-2xl'}`}>
 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-graphite">
-                    <h2 className="text-lg font-mono text-bone">Generate PDF</h2>
+                    <h2 className="text-lg font-mono text-bone flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-electric" />
+                        Generate & Preview
+                    </h2>
                     <button onClick={onClose} className="text-steel hover:text-bone">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-auto p-6 space-y-4">
-                    <p className="text-sm text-steel font-mono">
-                        Paste JSON data matching the exported schema to fill the template.
-                    </p>
+                <div className="flex-1 overflow-hidden flex">
+                    {/* Left Panel: Input */}
+                    <div className={`flex flex-col p-6 space-y-4 border-r border-graphite bg-void/30 ${previewUrl ? 'w-1/3' : 'w-full'}`}>
+                        <div className="flex justify-between items-center">
+                            <p className="text-sm text-steel font-mono">Input Data (JSON)</p>
+                            <button
+                                onClick={generateSampleJson}
+                                className="flex items-center gap-1 bg-charcoal border border-graphite px-2 py-1 rounded text-[10px] text-steel hover:text-bone transition-colors"
+                            >
+                                <Copy className="w-3 h-3" />
+                                Sample
+                            </button>
+                        </div>
 
-                    <div className="relative">
                         <textarea
                             value={jsonInput}
                             onChange={(e) => setJsonInput(e.target.value)}
-                            className="w-full h-64 bg-void border border-graphite rounded p-3 font-mono text-xs text-bone focus:border-electric outline-none resize-none"
+                            className="flex-1 w-full bg-void border border-graphite rounded p-3 font-mono text-xs text-bone focus:border-electric outline-none resize-none"
                             placeholder="{ ... }"
                         />
+
                         <button
-                            onClick={generateSampleJson}
-                            className="absolute top-2 right-2 flex items-center gap-1 bg-charcoal border border-graphite px-2 py-1 rounded text-[10px] text-steel hover:text-bone transition-colors"
+                            onClick={handlePreview}
+                            disabled={isGenerating || !jsonInput.trim()}
+                            className="btn btn-primary w-full flex items-center justify-center gap-2 py-3"
                         >
-                            <Copy className="w-3 h-3" />
-                            Sample
+                            {isGenerating ? (
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Play className="w-4 h-4" />
+                            )}
+                            {previewUrl ? 'Update Preview' : 'Generate Preview'}
                         </button>
                     </div>
-                </div>
 
-                {/* Footer */}
-                <div className="p-6 border-t border-graphite bg-void/50 flex justify-end gap-3">
-                    <button
-                        onClick={onClose}
-                        className="btn btn-ghost"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleGenerate}
-                        disabled={isGenerating || !jsonInput.trim()}
-                        className="btn btn-primary flex items-center gap-2"
-                    >
-                        {isGenerating ? 'Generating...' : (
-                            <>
-                                <Play className="w-4 h-4" />
-                                Generate PDF
-                            </>
-                        )}
-                    </button>
+                    {/* Right Panel: Preview */}
+                    {previewUrl && (
+                        <div className="flex-1 flex flex-col bg-graphite/10 relative">
+                            <iframe
+                                src={`${previewUrl}#toolbar=0&navpanes=0`}
+                                className="w-full h-full border-none"
+                                title="PDF Preview"
+                            />
+
+                            {/* Overlay Download Button */}
+                            <div className="absolute bottom-6 right-6">
+                                <button
+                                    onClick={handleDownload}
+                                    className="btn btn-primary shadow-lg flex items-center gap-2 px-6 py-3 text-sm"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    Download Final PDF
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
