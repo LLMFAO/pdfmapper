@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { X, Download, Copy, Play, RefreshCw, FileText, ChevronRight } from 'lucide-react';
