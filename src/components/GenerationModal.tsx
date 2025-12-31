@@ -79,7 +79,14 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
                 // Box Top (from Bottom) = height - (field.rect.y * height)
                 // We draw text slightly below the top of the box.
 
-                const fontSize = 10;
+                // Calculate Font Size
+                const fontSizeMap = {
+                    small: 7,
+                    medium: 9,
+                    large: 12
+                };
+                const fontSize = fontSizeMap[field.fontSize || 'medium'];
+
                 // Basic alignment: specific offset from top of box
                 const y = height - (field.rect.y * height) - fontSize - 2;
 

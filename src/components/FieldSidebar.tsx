@@ -305,6 +305,30 @@ export function FieldSidebar() {
                             />
                         </div>
 
+                        {/* Font Size (Text Only) */}
+                        {selectedField.type === 'text' && (
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Type className="w-3 h-3 text-steel" />
+                                    <span className="font-mono text-[10px] text-steel uppercase tracking-wider">Font Size</span>
+                                </div>
+                                <div className="flex bg-void rounded border border-graphite p-0.5">
+                                    {(['small', 'medium', 'large'] as const).map((size) => (
+                                        <button
+                                            key={size}
+                                            onClick={() => updateField(selectedField.id, { fontSize: size })}
+                                            className={`flex-1 text-[10px] py-1 font-mono transition-colors ${(selectedField.fontSize || 'medium') === size
+                                                    ? 'bg-charcoal text-electric shadow-sm'
+                                                    : 'text-steel hover:text-bone'
+                                                }`}
+                                        >
+                                            {size.charAt(0).toUpperCase() + size.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Position */}
                         <div>
                             <div className="flex items-center gap-2 mb-2">

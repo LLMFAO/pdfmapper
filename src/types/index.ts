@@ -26,6 +26,7 @@ export interface Field {
     key: string;           // JSON key (e.g., "first_name")
     type: FieldType;
     page_number: number;   // 1-indexed
+    fontSize?: 'small' | 'medium' | 'large';
     rect: FieldRect;
 }
 
