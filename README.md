@@ -20,11 +20,23 @@ Unlike standard PDF editors where you just "type text," PDF Mapper assigns a **u
 
 This means your PDF is no longer a document—it's an **API Endpoint**.
 
-### AI & EHR Integration Workflows
-Because every field relies on structured JSON data, you can automate your documentation flow:
-1.  **Ambient AI Scribe**: Have your AI tool listen to a patient visit and output a JSON object.
-2.  **EHR Export**: Export patient data from your Electronic Health Record system.
-3.  **Instant Generation**: Paste that JSON into PDF Mapper, and your complex, 5-page insurance authorization form is filled instantly and accurately.
+### 🤖 AI & Automation Workflows
+Because every field relies on structured JSON data, PDF Mapper becomes a powerful endpoint for your automation tools.
+
+#### 1. The "n8n" Webhook Workflow
+- **Trigger**: A typeform submission, Google Sheet row, or CRM update.
+- **Process**: n8n formats the data into your template's JSON schema.
+- **Action**: Generate standardized invoices, contracts, or applications instantly.
+
+#### 2. AI Agents (Legal, HR, Real Estate)
+- **Input**: Unstructured emails or meeting transcripts.
+- **Analysis**: LLM (ChatGPT/Claude) extracts key entities (names, dates, clauses).
+- **Output**: JSON that fills strict government or corporate PDF forms automatically.
+
+#### 3. Healthcare & Ambient Scribes
+- **Scenario**: Listen to a patient visit -> Extract discrete clinical data -> Generate reliable insurance authorization forms.
+
+This tool bridges the gap between **unstructured AI intelligence** and **rigid document requirements**.
 
 ## 🛠️ Tech Stack
 
