@@ -163,7 +163,7 @@ export function GenerationModal({ isOpen, onClose, fields, pdfUrl, templateName 
 
             // Generate Blob
             const pdfBytes = await pdfDoc.save();
-            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
 
             if (previewUrl) URL.revokeObjectURL(previewUrl);
 
