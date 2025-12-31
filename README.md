@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PDF Mapper & Generator 📄✨
 
-## Getting Started
+A sophisticated, browser-based tool for mapping interactions onto PDF documents and generating filled PDFs with dynamic data. built with **Next.js 14**, **React**, and **pdf-lib**.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 1. Visual Field Mapping
+- **Interactive Canvas**: Upload any PDF and draw mapping zones directly onto the document.
+- **Precision Controls**: Drag, resize, and fine-tune field positions.
+- **Field Properties**:
+  - **Key**: The unique JSON identifier for the data.
+  - **Type**: Text, Checkbox, or Date.
+  - **Font Size**: Control text size (`Small` - 7pt, `Medium` - 9pt, `Large` - 12pt).
+
+### 2. Live Generation & Preview
+- **Split-View Interface**: See your data form and the resulting PDF side-by-side.
+- **Dual Input Modes**:
+  - **Form View**: Auto-generated, user-friendly inputs sorted logically by page and position.
+  - **JSON View**: Raw JSON editor for power users, developers, and bulk data pasting.
+- **Real-Time Updates**: PDF preview updates automatically (debounced) as you type.
+- **Client-Side Generation**: Zero-latency PDF creation using `pdf-lib` in the browser.
+
+### 3. Template Management
+- **Save/Load**: Export your mapping schema to a `.template.json` file and reload it later.
+- **Portable Schemas**: JSON-based templates are easy to version control and share.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **PDF Engine**: [pdf-lib](https://pdf-lib.js.org/) (Client-side generation)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Notifications**: [Sonner](https://sonner.emilkowal.ski/)
+
+## 📦 Installation & Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/LLMFAO/pdfmapper.git
+   cd pdfmapper
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open the app**
+   Navigate to [http://localhost:3000/mapper](http://localhost:3000/mapper).
+
+## 📖 Usage Guide
+
+### Phase 1: Mapping
+1. **Upload**: Click "Upload PDF" and select your blank PDF form.
+2. **Draw**: Click and drag on the PDF canvas to create a new field box.
+3. **Configure**: In the right sidebar:
+   - Assign a unique `Field Key` (e.g., `patient_name`).
+   - Select the `Type` (Text or Checkbox).
+   - *Optional:* Adjust `Font Size` for text fields.
+4. **Repeat**: Map all necessary fields on the document.
+5. **Save**: Click **Save Template** to download the mapping configuration (`.template.json`).
+
+### Phase 2: Generating
+1. Click **Generate PDF** in the top header.
+2. The **Generation Modal** will open.
+3. **Enter Data**:
+   - Use the **Form** tab to fill in fields manually.
+   - Or switch to **JSON** tab to paste a complete data object.
+4. **Preview**: The PDF on the right will update automatically.
+5. **Download**: Click **Download Final PDF** to save the filled document.
+
+## 🧩 Template Architecture
+
+The template file is a standard JSON array of field definitions:
+
+```json
+[
+  {
+    "id": "uuid-v4",
+    "key": "full_name",
+    "type": "text",
+    "fontSize": "medium",
+    "page_number": 1,
+    "rect": {
+      "x": 0.15, // Percentage of page width (0-1)
+      "y": 0.25, // Percentage of page height (0-1)
+      "w": 0.30,
+      "h": 0.05
+    }
+  }
+]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚢 Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This project acts as a static Next.js application (or server-side). It is configured for deployment on **Netlify** or **Vercel**.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Build Command:** `npm run build`
+**Output Directory:** `.next`
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*Built with ❤️ by Anti-Gravity Agent*
